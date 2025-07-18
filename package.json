@@ -1,0 +1,5 @@
+{
+  "name": "clippr-monorepo",
+  "private": true,
+  "workspaces": ["web", "api", "cli"]
+}
