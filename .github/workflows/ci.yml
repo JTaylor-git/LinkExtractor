@@ -22,6 +22,6 @@ jobs:
           ls -l web/node_modules/.bin
           web/node_modules/.bin/svelte-kit --version
       - name: Build all packages
-        run: pnpm -r run svelte-kit build
+        run: pnpm -r run build
       - name: Test all packages
         run: pnpm -r run test
