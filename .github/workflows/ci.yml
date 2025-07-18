@@ -13,7 +13,7 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 10
-      - name: Install dependencies
+      - name: Install all dependencies
         run: pnpm install --no-frozen-lockfile
       - name: Clean and reinstall web dependencies
         run: |
