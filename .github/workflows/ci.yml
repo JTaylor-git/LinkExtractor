@@ -13,8 +13,12 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 10
-      - name: Install 
+      - name: Install
         run: pnpm install --no-frozen-lockfile
+      - name: Clean web dependencies
+        run: |
+          rm -rf web/node_modules web/pnpm-lock.yaml
+          pnpm install --filter ./web
       - name: Build
         run: pnpm -r run build
       - name: Test
