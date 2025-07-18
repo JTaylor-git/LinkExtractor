@@ -5,6 +5,9 @@
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "lib": ["es2019"]
     "esModuleInterop": true
   },
   "include": ["src/**/*"]
