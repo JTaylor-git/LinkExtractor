@@ -9,7 +9,7 @@
     "test": "echo \"No tests yet\""
   },
   "dependencies": {
-    "@sveltejs/kit": "^1.29.0",
+    "@sveltejs/kit": "^1.0.0",
     "svelte": "^3.0.0",
     "clippyjs": "^0.0.3"
   },
