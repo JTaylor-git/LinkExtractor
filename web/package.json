@@ -10,11 +10,11 @@
   },
   "dependencies": {
     "@sveltejs/kit": "^2.25.1",
-    "svelte": "^4.2.16",
+    "svelte": "^5.0.0",
     "clippyjs": "^0.0.3"
   },
   "devDependencies": {
-    "@sveltejs/adapter-auto": "^2.0.2",
+    "@sveltejs/adapter-auto": "^2.1.1",
     "typescript": "^5.2.2",
     "tailwindcss": "^3.3.0",
     "postcss": "^8.4.0",
