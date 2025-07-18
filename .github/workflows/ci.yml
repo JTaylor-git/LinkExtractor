@@ -13,6 +13,16 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 10
+      - name: Debug build context
+        run: |
+          echo "Current directory: $PWD"
+          echo "PATH: $PATH"
+          pnpm -v
+          node -v
+          which svelte-kit || true
+          npx svelte-kit --version || true
+          cd web && which svelte-kit || true
+          cd web && npx svelte-kit --version || true
       - name: Clean install all dependencies
         run: |
           rm -rf node_modules pnpm-lock.yaml web/node_modules web/pnpm-lock.yaml web/node_modules/.bin
