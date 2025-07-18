@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "pnpm -r run dev",
     "build": "pnpm -r run build",
+    "build": "pnpm --filter clippr-api run build && pnpm --filter clippr-cli run build",
     "test": "pnpm -r run test"
   }
 }

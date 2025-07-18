@@ -27,6 +27,16 @@
     clippy.load('Clippy', (a: any) => {
       agent = a;
       agentRef = a;
+  const hints: Record<number, string> = {
+    1: 'Enter the site URL above',
+    2: 'Set depth & file filters',
+    3: 'Click ▶︎ Run to start scraping',
+    4: 'All done—download your data!'
+  };
+
+  onMount(() => {
+    clippy.load('Clippy', (a: any) => {
+      agent = a;
       agent.show();
       agent.moveTo(window.innerWidth - 200, window.innerHeight - 200);
       agent.speak('🔍 Hi! I’m Clippr, your scraping assistant.');
@@ -34,6 +44,14 @@
     });
     return () => agent && agent.hide();
   });
+
+
+  export function stepTo(n: number) {
+    if (!agent) return;
+    const text = hints[n] || 'Let me know if you need help!';
+    agent.animate();
+    agent.speak(text);
+  }
 </script>
 
 <style>
