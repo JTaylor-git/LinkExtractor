@@ -9,6 +9,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import analyticsRouter from "./routes/analytics";
 import schedulerRouter from "./routes/scheduler";
+import apiV1Router from "./api/v1/index";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -199,6 +200,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Mount scheduler routes
   app.use("/api/scheduler", schedulerRouter);
+  
+  // Mount API v1 routes
+  app.use("/api/v1", apiV1Router);
 
   const httpServer = createServer(app);
   return httpServer;

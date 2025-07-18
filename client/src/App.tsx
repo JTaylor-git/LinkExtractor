@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import Projects from "@/pages/Projects";
 import Analytics from "@/pages/Analytics";
+import Plugins from "@/pages/Plugins";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/projects" component={Projects} />
       <Route path="/projects/:id" component={Projects} />
       <Route path="/analytics" component={Analytics} />
+      <Route path="/plugins" component={Plugins} />
       <Route component={NotFound} />
     </Switch>
   );
