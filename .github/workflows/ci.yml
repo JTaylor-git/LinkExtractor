@@ -14,7 +14,9 @@ jobs:
         with:
           version: 10
       - name: Install all dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: |
+          rm -rf node_modules pnpm-lock.yaml
+          pnpm install --no-frozen-lockfile
       - name: Clean and reinstall web dependencies
         run: |
           rm -rf web/node_modules web/pnpm-lock.yaml
