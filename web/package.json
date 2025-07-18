@@ -24,6 +24,5 @@
     "postcss": "^8.4.0",
     "autoprefixer": "^10.4.0",
     "vite": "^4.5.0"
-    "autoprefixer": "^10.4.0"
   }
 }
