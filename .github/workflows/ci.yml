@@ -15,7 +15,7 @@ jobs:
           version: 10
       - name: Clean install all dependencies
         run: |
-          rm -rf node_modules pnpm-lock.yaml web/node_modules web/pnpm-lock.yaml
+          rm -rf node_modules pnpm-lock.yaml web/node_modules web/pnpm-lock.yaml web/node_modules/.bin
           pnpm install --no-frozen-lockfile
       - name: Verify SvelteKit CLI availability
         run: |
