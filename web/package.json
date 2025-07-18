@@ -6,6 +6,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
+  },
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",
