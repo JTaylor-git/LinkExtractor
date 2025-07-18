@@ -8,6 +8,7 @@ import Projects from "@/pages/Projects";
 import Analytics from "@/pages/Analytics";
 import Plugins from "@/pages/Plugins";
 import Globe from "@/pages/Globe";
+import Teams from "@/pages/Teams";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/analytics" component={Analytics} />
       <Route path="/plugins" component={Plugins} />
       <Route path="/globe" component={Globe} />
+      <Route path="/teams" component={Teams} />
       <Route component={NotFound} />
     </Switch>
   );

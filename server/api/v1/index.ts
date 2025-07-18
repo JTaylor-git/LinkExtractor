@@ -6,6 +6,8 @@ import schedulerRouter from './scheduler';
 import systemRouter from './system';
 import docsRouter from './docs';
 import pluginsRouter from './plugins';
+import teamsRouter from './teams';
+import invitationsRouter from './invitations';
 
 const router = Router();
 
@@ -17,6 +19,8 @@ router.use('/scheduler', schedulerRouter);
 router.use('/system', systemRouter);
 router.use('/docs', docsRouter);
 router.use('/plugins', pluginsRouter);
+router.use('/teams', teamsRouter);
+router.use('/invitations', invitationsRouter);
 
 // API info endpoint
 router.get('/', (req, res) => {
@@ -30,7 +34,9 @@ router.get('/', (req, res) => {
       analytics: '/api/v1/analytics',
       scheduler: '/api/v1/scheduler',
       system: '/api/v1/system',
-      plugins: '/api/v1/plugins'
+      plugins: '/api/v1/plugins',
+      teams: '/api/v1/teams',
+      invitations: '/api/v1/invitations'
     },
     documentation: '/api/v1/docs'
   });

@@ -47,16 +47,30 @@ Preferred communication style: Simple, everyday language.
 - **Export Options**: Multiple format support (JSON, CSV, XML, GeoJSON, KML)
 
 ### 3. Project Management
-- **Organization**: Group related scraping jobs under projects
-- **Persistence**: Database storage with user association
+- **Organization**: Group related scraping jobs under projects with team association
+- **Persistence**: Database storage with user and team association
 - **Status Tracking**: Real-time job status updates (queued, running, completed, failed)
 - **History**: Maintain logs of all scraping activities
+- **Collaboration**: Team-based project sharing with role-based permissions
 
-### 4. Dashboard
-- **Real-time Metrics**: Active jobs, queue status, system health
-- **Visual Feedback**: Progress bars, status indicators, trend charts
-- **System Status**: Monitor scraping engine, proxy pool, database health
-- **Recent Activity**: List of recent projects and their status
+### 4. Dashboard Suite
+- **Main Dashboard**: Real-time metrics, active jobs, queue status, system health
+- **Analytics Dashboard**: Historical trends, performance metrics, success rates
+- **Globe Dashboard**: Interactive 3D visualization of global scraping activities
+- **Team Dashboard**: Member management, role assignments, activity auditing
+
+### 5. Plugin Ecosystem
+- **Dynamic Plugin Management**: Install, enable, disable, and configure plugins
+- **Plugin Registry**: Centralized catalog of available plugins with metadata
+- **API Integration**: RESTful API for plugin lifecycle management
+- **Security**: Sandboxed execution with permission controls
+
+### 6. Team Management (RBAC)
+- **Multi-tenant Architecture**: Team-based organization with resource limits
+- **Role-based Access Control**: Owner, Admin, Member, Viewer roles with granular permissions
+- **Team Collaboration**: Invite system, member management, project sharing
+- **Activity Auditing**: Comprehensive logging of all team and project activities
+- **Project Visibility**: Private, team-only, or public project access controls
 
 ## Data Flow
 
@@ -78,10 +92,15 @@ Preferred communication style: Simple, everyday language.
 7. Job status updated to completed/failed
 
 ### 3. Database Schema
-- **Users**: Basic user management (default user for MVP)
-- **Projects**: Scraping project configuration and metadata
+- **Users**: Enhanced user management with roles, profiles, and authentication
+- **Teams**: Organization-level management with plans and resource limits
+- **Team Members**: Role-based team membership with permissions
+- **Projects**: Scraping project configuration with team association and visibility
+- **Project Collaborators**: Project-level collaboration with granular permissions
 - **Scrape Jobs**: Individual scraping job instances with progress tracking
 - **Scraped Data**: Actual scraped content and extracted data
+- **Activity Logs**: Comprehensive audit trail for all system actions
+- **Invitations**: Team and project invitation system with secure tokens
 
 ## External Dependencies
 

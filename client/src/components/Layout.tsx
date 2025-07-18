@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Zap, Globe, Folder, Layers, FileText, Settings, User, BarChart3, Package, Menu, X, Home } from "lucide-react";
+import { Zap, Globe, Folder, Layers, FileText, Settings, User, BarChart3, Package, Menu, X, Home, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
@@ -44,6 +44,7 @@ export default function Layout({ children }: LayoutProps) {
     { path: "/analytics", label: "Analytics", icon: BarChart3 },
     { path: "/plugins", label: "Plugins", icon: Package },
     { path: "/globe", label: "Globe", icon: Globe },
+    { path: "/teams", label: "Teams", icon: Users },
     { path: "/templates", label: "Templates", icon: Layers },
     { path: "/logs", label: "Logs", icon: FileText },
     { path: "/settings", label: "Settings", icon: Settings },
