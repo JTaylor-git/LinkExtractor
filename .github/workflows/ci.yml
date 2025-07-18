@@ -13,17 +13,16 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 10
-      - name: Install all dependencies
+      - name: Clean install all dependencies
         run: |
-          rm -rf node_modules pnpm-lock.yaml
+          rm -rf node_modules pnpm-lock.yaml web/node_modules web/pnpm-lock.yaml
           pnpm install --no-frozen-lockfile
-      - name: Clean and reinstall web dependencies
-        run: |
-          rm -rf web/node_modules web/pnpm-lock.yaml
-          pnpm install --filter ./web
       - name: Verify SvelteKit CLI availability
-        run: ls -l web/node_modules/.bin && npx --prefix web svelte-kit --version
+        run: |
+          ls -l web/node_modules/.bin
+          web/node_modules/.bin/svelte-kit --version
       - name: Build all packages
         run: pnpm -r run build
       - name: Test all packages
         run: pnpm -r run test
+      
