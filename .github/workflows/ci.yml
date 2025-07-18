@@ -17,8 +17,6 @@ jobs:
         run: |
           rm -rf node_modules pnpm-lock.yaml web/node_modules web/pnpm-lock.yaml
           pnpm install --no-frozen-lockfile
-      - name: Ensure latest SvelteKit in web
-        run: pnpm add -F ./web @sveltejs/kit@latest
       - name: Verify SvelteKit CLI availability
         run: |
           ls -l web/node_modules/.bin
