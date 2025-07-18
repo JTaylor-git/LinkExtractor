@@ -13,7 +13,7 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 10
-      - name: Install
+      - name: Install --no-frozen-lockfile
         run: pnpm install
       - name: Build
         run: pnpm -r run build
