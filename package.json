@@ -1,0 +1,10 @@
+{
+  "name": "link-extractor",
+  "private": true,
+  "workspaces": ["web", "api", "cli"],
+  "scripts": {
+    "dev": "pnpm -r run dev",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test"
+  }
+}
