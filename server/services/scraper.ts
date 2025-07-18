@@ -4,6 +4,8 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import archiver from "archiver";
+import { ProxyManager, ProxyConfig } from "../engine/ProxyManager";
+import { HTTPWorker } from "../engine/HTTPWorker";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,11 +20,32 @@ export async function scrapeWebsite(project: Project, jobId: number): Promise<vo
   try {
     console.log(`Starting scrape job ${jobId} for project ${project.name}`);
     
+    // Setup proxy configuration
+    const proxyConfig: ProxyConfig = {
+      mode: (project.proxyMode as any) || 'none',
+      apiKey: project.proxyApiKey || undefined,
+      listFile: project.proxyListFile || undefined,
+    };
+    
+    // Initialize proxy manager if needed
+    let proxyManager: ProxyManager | undefined;
+    if (proxyConfig.mode !== 'none') {
+      try {
+        proxyManager = new ProxyManager(proxyConfig);
+      } catch (error) {
+        console.error('Failed to initialize proxy manager:', error);
+        // Continue without proxy
+      }
+    }
+    
+    // Create HTTP worker
+    const httpWorker = new HTTPWorker(proxyManager);
+    
     // Update job status to running
     await storage.updateScrapeJob(jobId, { status: "running" });
 
     const results: ScrapeResult[] = [];
-    const urlsToScrape = await discoverUrls(project.startUrl, project.depth || 2);
+    const urlsToScrape = await discoverUrls(project.startUrl, project.depth || 2, httpWorker);
     
     // Update total URLs
     await storage.updateScrapeJob(jobId, { totalUrls: urlsToScrape.length });
@@ -32,7 +55,7 @@ export async function scrapeWebsite(project: Project, jobId: number): Promise<vo
 
     for (const url of urlsToScrape) {
       try {
-        const result = await scrapeUrl(url);
+        const result = await scrapeUrl(url, httpWorker);
         results.push(result);
         
         // Store scraped data
@@ -82,7 +105,7 @@ export async function scrapeWebsite(project: Project, jobId: number): Promise<vo
   }
 }
 
-async function discoverUrls(startUrl: string, depth: number): Promise<string[]> {
+async function discoverUrls(startUrl: string, depth: number, httpWorker: HTTPWorker): Promise<string[]> {
   const urls = new Set<string>();
   const queue = [{ url: startUrl, depth: 0 }];
   const visited = new Set<string>();
@@ -97,8 +120,7 @@ async function discoverUrls(startUrl: string, depth: number): Promise<string[]> 
 
     if (currentDepth < depth) {
       try {
-        const response = await fetch(url);
-        const html = await response.text();
+        const html = await httpWorker.fetch({ url });
         const linkRegex = /href="([^"]+)"/g;
         let match;
         
@@ -124,9 +146,8 @@ async function discoverUrls(startUrl: string, depth: number): Promise<string[]> 
   return Array.from(urls);
 }
 
-async function scrapeUrl(url: string): Promise<ScrapeResult> {
-  const response = await fetch(url);
-  const html = await response.text();
+async function scrapeUrl(url: string, httpWorker: HTTPWorker): Promise<ScrapeResult> {
+  const html = await httpWorker.fetch({ url });
   
   // Extract title
   const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);

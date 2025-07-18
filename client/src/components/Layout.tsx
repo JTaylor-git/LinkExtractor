@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Zap, Globe, Folder, Layers, FileText, Settings, User } from "lucide-react";
+import { Zap, Globe, Folder, Layers, FileText, Settings, User, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -12,6 +12,7 @@ export default function Layout({ children }: LayoutProps) {
   const navItems = [
     { path: "/", label: "Dashboard", icon: Globe },
     { path: "/projects", label: "Projects", icon: Folder },
+    { path: "/analytics", label: "Analytics", icon: BarChart3 },
     { path: "/templates", label: "Templates", icon: Layers },
     { path: "/logs", label: "Logs", icon: FileText },
     { path: "/settings", label: "Settings", icon: Settings },

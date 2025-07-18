@@ -7,6 +7,8 @@ import { z } from "zod";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import analyticsRouter from "./routes/analytics";
+import schedulerRouter from "./routes/scheduler";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -191,6 +193,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch stats" });
     }
   });
+
+  // Mount analytics routes
+  app.use("/api", analyticsRouter);
+  
+  // Mount scheduler routes
+  app.use("/api/scheduler", schedulerRouter);
 
   const httpServer = createServer(app);
   return httpServer;

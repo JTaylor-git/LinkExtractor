@@ -19,6 +19,10 @@ export const projects = pgTable("projects", {
   depth: integer("depth").default(2),
   exportFormats: text("export_formats").array().default([]),
   status: text("status").notNull().default("created"), // created, running, completed, failed
+  // Proxy configuration
+  proxyMode: text("proxy_mode").default("none"), // none, scraperapi, crawlbase, custom
+  proxyApiKey: text("proxy_api_key"),
+  proxyListFile: text("proxy_list_file"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -58,6 +62,9 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
   startUrl: true,
   depth: true,
   exportFormats: true,
+  proxyMode: true,
+  proxyApiKey: true,
+  proxyListFile: true,
 });
 
 export const insertScrapeJobSchema = createInsertSchema(scrapeJobs).pick({

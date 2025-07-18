@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import Projects from "@/pages/Projects";
+import Analytics from "@/pages/Analytics";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/projects" component={Projects} />
       <Route path="/projects/:id" component={Projects} />
+      <Route path="/analytics" component={Analytics} />
       <Route component={NotFound} />
     </Switch>
   );

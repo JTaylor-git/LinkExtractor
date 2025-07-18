@@ -1,0 +1,438 @@
+Sprint 4: Full REST & gRPC API (2 Weeks)
+
+Goal: Expose every core platform capability over both HTTP (REST) and gRPC so external clients (web UIs, CLI, third‑party apps) can create projects, submit scrapes, poll status, and fetch results.
+📝 User Stories
+
+    REST – Project Management
+
+        As an integrator, I want to POST /api/projects (name, startUrl, depth, filters, renderMode, proxyConfig) and receive a projectId.
+
+        As an integrator, I want to GET /api/projects to list all my projects.
+
+    REST – Task Lifecycle
+
+        As an integrator, I want to POST /api/projects/:projectId/tasks to kick off a scrape, returning a taskId.
+
+        As an integrator, I want to GET /api/tasks/:taskId/status to see { status, progress }.
+
+        As an integrator, I want to GET /api/tasks/:taskId/result to download my ZIP or JSON manifest.
+
+    gRPC – Same Surface
+
+        As a power user, I want a gRPC Scraper service with methods CreateProject, ListProjects, SubmitTask, GetTaskStatus, DownloadResult.
+
+        As a developer, I need a .proto file describing all messages/services, and a Node.js gRPC server implementation.
+
+    Developer Experience
+
+        As a dev, I want clean, type‑safe handler code, automatic proto loading (via @grpc/proto-loader), and environment‑driven ports.
+
+✔ Acceptance Criteria
+
+    REST endpoints function end‑to‑end: create project → submit task → poll → download.
+
+    gRPC methods function identically (test with grpcurl or generated client).
+
+    Type definitions match .proto schema.
+
+    Unit tests for REST routes (using Supertest) and gRPC handlers (using a test client).
+
+    Server start script launches Express on PORT and gRPC on GRPC_PORT.
+
+    Dockerfile updated to open both ports.
+
+📂 File Structure
+
+/api
+└─ src
+   ├─ server
+   │   ├─ rest
+   │   │   ├─ project.routes.ts
+   │   │   ├─ task.routes.ts
+   │   │   └─ index.ts
+   │   └─ grpc
+   │       ├─ scraper.proto
+   │       ├─ grpcServer.ts
+   │       └─ scraperServiceImpl.ts
+   ├─ engine           (existing: ScraperService, SchedulerService, etc.)
+   └─ types.ts         (extended as below)
+
+/tests
+└─ api
+   ├─ rest
+   │   ├─ project.routes.test.ts
+   │   └─ task.routes.test.ts
+   └─ grpc
+       └─ scraper.test.ts
+
+Dockerfile
+
+1) Extend types.ts
+
+// api/src/types.ts
+export interface ProjectConfig {
+  name: string;
+  startUrl: string;
+  depth: number;
+  include: string[];
+  renderMode: 'http'|'puppeteer';
+  proxyConfig: ProxyConfig;
+  scheduleConfig?: ScheduleConfig;
+}
+
+export interface Project {
+  id: string;
+  config: ProjectConfig;
+  createdAt: string;
+}
+
+export interface Task {
+  id: string;
+  projectId: string;
+  status: 'queued'|'running'|'completed'|'failed';
+  progress: number;
+}
+
+export interface TaskStatus {
+  status: Task['status'];
+  progress: number; // 0–100
+}
+
+export interface ResultData {
+  manifest: string;      // JSON string or path
+  downloadUrl: string;   // presigned URL or local path
+}
+
+// Re‑export JobConfig, ProxyConfig, ScheduleConfig from engine/types
+export { JobConfig, ProxyConfig, ScheduleConfig } from '../engine/types.js';
+
+2) .proto Definition
+
+// api/src/server/grpc/scraper.proto
+syntax = "proto3";
+package clippr;
+
+message Empty {}
+
+// Project
+message ProjectConfig {
+  string name        = 1;
+  string startUrl    = 2;
+  int32  depth       = 3;
+  repeated string include     = 4;
+  string renderMode = 5;
+  ProxyConfig proxyConfig = 6;
+}
+message ProxyConfig {
+  string mode     = 1;
+  string apiKey   = 2;
+  string listFile = 3;
+}
+message ScheduleConfig {
+  string cron           = 1;
+  bool   watch          = 2;
+  string watchSelector  = 3;
+}
+message Project {
+  string id        = 1;
+  ProjectConfig config = 2;
+  string createdAt = 3;
+}
+message ListProjectsResponse {
+  repeated Project projects = 1;
+}
+
+// Task
+message TaskRequest {
+  string projectId         = 1;
+  JobConfig jobConfig      = 2;
+  ScheduleConfig scheduleConfig = 3;
+}
+message JobConfig {
+  string startUrl   = 1;
+  int32  depth      = 2;
+  repeated string include     = 3;
+  string renderMode = 4;
+  ProxyConfig proxyConfig = 5;
+}
+message SubmitTaskResponse {
+  Task task = 1;
+}
+message Task {
+  string id        = 1;
+  string projectId = 2;
+  string status    = 3;
+  int32  progress  = 4;
+}
+message GetTaskStatusRequest {
+  string taskId = 1;
+}
+message TaskStatusResponse {
+  string status   = 1;
+  int32  progress = 2;
+}
+message DownloadResultRequest {
+  string taskId = 1;
+}
+message ResultData {
+  string manifest   = 1;
+  string downloadUrl= 2;
+}
+
+// Service
+service Scraper {
+  rpc CreateProject (ProjectConfig)       returns (Project);
+  rpc ListProjects   (Empty)             returns (ListProjectsResponse);
+  rpc SubmitTask     (TaskRequest)       returns (SubmitTaskResponse);
+  rpc GetTaskStatus  (GetTaskStatusRequest) returns (TaskStatusResponse);
+  rpc DownloadResult (DownloadResultRequest) returns (ResultData);
+}
+
+3) REST – Express Routes
+a) project.routes.ts
+
+// api/src/server/rest/project.routes.ts
+import { Router } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+import { ProjectConfig, Project } from '../../types.js';
+
+// In‑memory store (swap out for real DB later)
+const projects = new Map<string, Project>();
+const router = Router();
+
+// POST /api/projects
+router.post('/', (req, res) => {
+  const config = req.body as ProjectConfig;
+  const id = uuidv4();
+  const project: Project = { id, config, createdAt: new Date().toISOString() };
+  projects.set(id, project);
+  res.status(201).json(project);
+});
+
+// GET /api/projects
+router.get('/', (_req, res) => {
+  res.json({ projects: Array.from(projects.values()) });
+});
+
+export default router;
+
+b) task.routes.ts
+
+// api/src/server/rest/task.routes.ts
+import { Router } from 'express';
+import { scheduleJob, scrapeQueue } from '../../engine/SchedulerService.js';
+import { Task, TaskStatus } from '../../types.js';
+import { v4 as uuidv4 } from 'uuid';
+
+const tasks = new Map<string, Task>();
+const router = Router();
+
+// POST /api/projects/:pid/tasks
+router.post('/projects/:pid/tasks', async (req, res) => {
+  const projectId = req.params.pid;
+  const { jobConfig, scheduleConfig } = req.body;
+  const taskId = uuidv4();
+  const task: Task = { id: taskId, projectId, status: 'queued', progress: 0 };
+  tasks.set(taskId, task);
+
+  if (scheduleConfig?.cron || scheduleConfig?.watch) {
+    await scheduleJob(taskId, { ...jobConfig, scheduleConfig }, scheduleConfig.cron);
+  } else {
+    await scrapeQueue.add(taskId, jobConfig);
+  }
+  res.status(202).json(task);
+});
+
+// GET /api/tasks/:tid/status
+router.get('/tasks/:tid/status', (req, res) => {
+  const t = tasks.get(req.params.tid);
+  if (!t) return res.sendStatus(404);
+  // Ideally subscribe to bull events to update t.status/t.progress
+  res.json({ status: t.status, progress: t.progress } as TaskStatus);
+});
+
+// GET /api/tasks/:tid/result
+router.get('/tasks/:tid/result', (req, res) => {
+  // locate manifest & ZIP in local fs or S3
+  const manifest = `/data/${req.params.tid}/manifest.json`;
+  res.download(manifest);
+});
+
+export default router;
+
+c) REST Index & Server Boot
+
+// api/src/server/rest/index.ts
+import express from 'express';
+import projectRoutes from './project.routes.js';
+import taskRoutes from './task.routes.js';
+
+export function createRestApp() {
+  const app = express();
+  app.use(express.json());
+  app.use('/api/projects', projectRoutes);
+  app.use('/api', taskRoutes);
+  return app;
+}
+
+// api/src/server/server.ts
+import { createRestApp } from './rest/index.js';
+import { startGrpcServer } from './grpc/grpcServer.js';
+
+const PORT = process.env.PORT || 4000;
+const GRPC_PORT = process.env.GRPC_PORT || 50051;
+
+// 1) Start REST
+const app = createRestApp();
+app.listen(PORT, () => console.log(`REST listening on ${PORT}`));
+
+// 2) Start gRPC
+startGrpcServer(GRPC_PORT);
+
+4) gRPC – Server & Implementation
+a) scraperServiceImpl.ts
+
+// api/src/server/grpc/scraperServiceImpl.ts
+import { projects, tasks } from '../rest/_stores.js';
+import { ScraperService } from '../../engine/ScraperService.js';
+import { scheduleJob } from '../../engine/SchedulerService.js';
+import { v4 as uuidv4 } from 'uuid';
+
+export const scraperImpl = {
+  CreateProject: (call, callback) => {
+    const cfg = call.request;
+    const id = uuidv4();
+    const proj = { id, config: cfg, createdAt: new Date().toISOString() };
+    projects.set(id, proj);
+    callback(null, proj);
+  },
+  ListProjects: (_call, callback) => {
+    callback(null, { projects: Array.from(projects.values()) });
+  },
+  SubmitTask: async (call, callback) => {
+    const { projectId, jobConfig, scheduleConfig } = call.request;
+    const taskId = uuidv4();
+    const task = { id: taskId, projectId, status: 'queued', progress: 0 };
+    tasks.set(taskId, task);
+    if (scheduleConfig?.cron || scheduleConfig?.watch) {
+      await scheduleJob(taskId, { ...jobConfig, scheduleConfig }, scheduleConfig.cron);
+    } else {
+      await scrapeQueue.add(taskId, jobConfig);
+    }
+    callback(null, { task });
+  },
+  GetTaskStatus: (call, callback) => {
+    const tid = call.request.taskId;
+    const t = tasks.get(tid);
+    if (!t) return callback({ code: 5, message: 'Not found' });
+    callback(null, { status: t.status, progress: t.progress });
+  },
+  DownloadResult: (_call, callback) => {
+    // For simplicity, inline the URL/path
+    const tid = _call.request.taskId;
+    const manifest = `/data/${tid}/manifest.json`;
+    callback(null, { manifest, downloadUrl: manifest });
+  }
+};
+
+b) grpcServer.ts
+
+// api/src/server/grpc/grpcServer.ts
+import grpc from '@grpc/grpc-js';
+import protoLoader from '@grpc/proto-loader';
+import path from 'path';
+import { scraperImpl } from './scraperServiceImpl.js';
+
+export function startGrpcServer(port: string|number) {
+  const protoPath = path.resolve(__dirname, 'scraper.proto');
+  const packageDef = protoLoader.loadSync(protoPath, {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true
+  });
+  const pkg = grpc.loadPackageDefinition(packageDef).clippr as any;
+  const server = new grpc.Server();
+  server.addService(pkg.Scraper.service, scraperImpl);
+  server.bindAsync(`0.0.0.0:${port}`, grpc.ServerCredentials.createInsecure(), () => {
+    server.start();
+    console.log(`gRPC listening on ${port}`);
+  });
+}
+
+5) Tests
+a) REST with Supertest
+
+// tests/api/rest/project.routes.test.ts
+import request from 'supertest';
+import { createRestApp } from '../../api/src/server/rest/index.js';
+
+describe('Project REST', () => {
+  const app = createRestApp();
+
+  it('creates and lists projects', async () => {
+    const res1 = await request(app)
+      .post('/api/projects')
+      .send({ name:'P', startUrl:'https://x', depth:1, include:['html'], renderMode:'http', proxyConfig:{mode:'none'} });
+    expect(res1.status).toBe(201);
+    expect(res1.body.id).toBeDefined();
+
+    const res2 = await request(app).get('/api/projects');
+    expect(res2.body.projects.length).toBeGreaterThan(0);
+  });
+});
+
+b) gRPC with grpc-js
+
+// tests/api/grpc/scraper.test.ts
+import grpc from '@grpc/grpc-js';
+import protoLoader from '@grpc/proto-loader';
+import path from 'path';
+
+const PROTO_PATH = path.resolve(__dirname, '../../api/src/server/grpc/scraper.proto');
+let client: any;
+
+beforeAll(() => {
+  const pkgDef = protoLoader.loadSync(PROTO_PATH, {});
+  const pkg = grpc.loadPackageDefinition(pkgDef).clippr as any;
+  client = new pkg.Scraper('localhost:50051', grpc.credentials.createInsecure());
+});
+
+it('can CreateProject and ListProjects', done => {
+  client.CreateProject({ name:'G', startUrl:'', depth:1, include:[], renderMode:'http', proxyConfig:{mode:'none'} },
+    (err: any, proj: any) => {
+      expect(err).toBeNull();
+      expect(proj.id).toBeDefined();
+      client.ListProjects({}, (e: any, resp: any) => {
+        expect(resp.projects.length).toBeGreaterThan(0);
+        done();
+      });
+    }
+  );
+});
+
+✅ Next Steps
+
+    Merge this sprint into /api.
+
+    Install new deps:
+
+cd api
+npm install express @grpc/grpc-js @grpc/proto-loader supertest uuid
+
+Update Dockerfile to expose 50051 and install grpc-tools if needed.
+
+Run Tests:
+
+npm test
+
+Start Servers:
+
+PORT=4000 GRPC_PORT=50051 npm run dev --prefix api
+
+Validate:
+
+    REST via curl http://localhost:4000/api/projects
+
+    gRPC via grpcurl -plaintext localhost:50051 clippr.Scraper/ListProjects

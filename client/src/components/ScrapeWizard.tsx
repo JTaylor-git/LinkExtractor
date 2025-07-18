@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,6 +21,9 @@ const formSchema = z.object({
   startUrl: z.string().url("Please enter a valid URL"),
   depth: z.number().min(1).max(10),
   exportFormats: z.array(z.string()).min(1, "Select at least one export format"),
+  proxyMode: z.string().optional(),
+  proxyApiKey: z.string().optional(),
+  proxyListFile: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -43,6 +47,9 @@ export default function ScrapeWizard({ open, onOpenChange }: ScrapeWizardProps) 
       startUrl: "",
       depth: 2,
       exportFormats: ["json"],
+      proxyMode: "none",
+      proxyApiKey: "",
+      proxyListFile: "",
     },
   });
 
@@ -283,6 +290,49 @@ export default function ScrapeWizard({ open, onOpenChange }: ScrapeWizardProps) 
                 {form.formState.errors.exportFormats && (
                   <p className="text-shodan-error text-sm mt-1">{form.formState.errors.exportFormats.message}</p>
                 )}
+              </div>
+
+              <div>
+                <Label className="text-shodan-text">Proxy Configuration</Label>
+                <div className="space-y-3 mt-2">
+                  <div>
+                    <Select 
+                      value={form.watch("proxyMode") || "none"}
+                      onValueChange={(value) => form.setValue("proxyMode", value)}
+                    >
+                      <SelectTrigger className="bg-shodan-surface border-shodan-surface text-shodan-text">
+                        <SelectValue placeholder="Select proxy mode" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-shodan-surface border-shodan-surface">
+                        <SelectItem value="none">No Proxy</SelectItem>
+                        <SelectItem value="scraperapi">ScraperAPI</SelectItem>
+                        <SelectItem value="crawlbase">Crawlbase</SelectItem>
+                        <SelectItem value="custom">Custom Proxy List</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {(form.watch("proxyMode") === "scraperapi" || form.watch("proxyMode") === "crawlbase") && (
+                    <div>
+                      <Input
+                        placeholder="API Key"
+                        type="password"
+                        className="bg-shodan-surface border-shodan-surface text-shodan-text"
+                        {...form.register("proxyApiKey")}
+                      />
+                    </div>
+                  )}
+                  
+                  {form.watch("proxyMode") === "custom" && (
+                    <div>
+                      <Input
+                        placeholder="Path to proxy list file"
+                        className="bg-shodan-surface border-shodan-surface text-shodan-text"
+                        {...form.register("proxyListFile")}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="flex justify-between">
