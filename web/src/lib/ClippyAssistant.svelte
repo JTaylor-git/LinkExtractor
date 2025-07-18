@@ -1,3 +1,21 @@
+<script context="module" lang="ts">
+  const hints: Record<number, string> = {
+    1: 'Enter the site URL above',
+    2: 'Set depth & file filters',
+    3: 'Click ▶︎ Run to start scraping',
+    4: 'All done—download your data!'
+  };
+
+  let agentRef: any;
+
+  export function stepTo(n: number) {
+    if (!agentRef) return;
+    const text = hints[n] || 'Let me know if you need help!';
+    agentRef.animate();
+    agentRef.speak(text);
+  }
+</script>
+
 <script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
   import clippy from 'clippyjs';
@@ -5,6 +23,10 @@
   const dispatch = createEventDispatcher();
   let agent: any;
 
+  onMount(() => {
+    clippy.load('Clippy', (a: any) => {
+      agent = a;
+      agentRef = a;
   const hints: Record<number, string> = {
     1: 'Enter the site URL above',
     2: 'Set depth & file filters',
@@ -22,6 +44,7 @@
     });
     return () => agent && agent.hide();
   });
+
 
   export function stepTo(n: number) {
     if (!agent) return;
