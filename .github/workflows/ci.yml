@@ -19,6 +19,8 @@ jobs:
         run: |
           rm -rf web/node_modules web/pnpm-lock.yaml
           pnpm install --filter ./web
+      - name: Verify SvelteKit CLI availability
+        run: ls -l web/node_modules/.bin && npx --prefix web svelte-kit --version
       - name: Build all packages
         run: pnpm -r run build
       - name: Test all packages
