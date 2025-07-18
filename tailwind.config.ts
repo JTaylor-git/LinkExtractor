@@ -11,6 +11,16 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        // Shodan-style colors
+        'shodan-bg': '#0A0A0D',
+        'shodan-surface': '#151519',
+        'shodan-text': '#E6E6E6',
+        'shodan-accent': '#1AFFD5',
+        'shodan-accent2': '#00FFC2',
+        'shodan-success': '#4AFF4A',
+        'shodan-warning': '#FFCD3C',
+        'shodan-error': '#FF4D4F',
+        
         background: "var(--background)",
         foreground: "var(--foreground)",
         card: {
