@@ -8,11 +8,6 @@
     "preview": "svelte-kit preview",
     "test": "echo \"No tests yet\""
   },
-   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
   "dependencies": {
     "@sveltejs/kit": "^1.0.0",
     "svelte": "^3.0.0",
