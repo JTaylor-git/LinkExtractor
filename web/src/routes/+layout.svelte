@@ -1,7 +1,3 @@
-<script>
-  export let data;
-</script>
-
 <svelte:head>
   <link rel="stylesheet" href="/tailwind.css">
 </svelte:head>
