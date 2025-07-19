@@ -216,7 +216,7 @@ export default function TeamsPage() {
   if (teamsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-shodan-text">Loading teams...</div>
+        <div className="text-white">Loading teams...</div>
       </div>
     );
   }
@@ -226,54 +226,54 @@ export default function TeamsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-shodan-text flex items-center gap-3">
-            <Users className="h-8 w-8 text-shodan-accent" />
+          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+            <Users className="h-8 w-8 text-[hsl(188,95%,43%)]" />
             Team Management
           </h1>
-          <p className="text-shodan-text/60 mt-2">
+          <p className="text-[hsl(215,20%,65%)] mt-2">
             Manage your teams, members, and collaboration settings
           </p>
         </div>
         
         <Dialog open={isCreateTeamOpen} onOpenChange={setIsCreateTeamOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-shodan-accent hover:bg-shodan-accent/90 text-shodan-bg">
+            <Button className="bg-[hsl(188,95%,43%)] hover:bg-[hsl(186,85%,57%)] text-[hsl(222,47%,11%)] font-medium">
               <Plus className="h-4 w-4 mr-2" />
               Create Team
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-shodan-surface border-shodan-accent/30">
+          <DialogContent className="glassmorphism">
             <DialogHeader>
-              <DialogTitle className="text-shodan-text">Create New Team</DialogTitle>
+              <DialogTitle className="text-white">Create New Team</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="team-name" className="text-shodan-text">Team Name</Label>
+                <Label htmlFor="team-name" className="text-white">Team Name</Label>
                 <Input
                   id="team-name"
                   value={newTeamData.name}
                   onChange={(e) => setNewTeamData({ ...newTeamData, name: e.target.value })}
-                  className="bg-shodan-surface border-shodan-accent/30 text-shodan-text"
+                  className="dark-input"
                   placeholder="Enter team name"
                 />
               </div>
               <div>
-                <Label htmlFor="team-description" className="text-shodan-text">Description</Label>
+                <Label htmlFor="team-description" className="text-white">Description</Label>
                 <Textarea
                   id="team-description"
                   value={newTeamData.description}
                   onChange={(e) => setNewTeamData({ ...newTeamData, description: e.target.value })}
-                  className="bg-shodan-surface border-shodan-accent/30 text-shodan-text"
+                  className="dark-input"
                   placeholder="Enter team description"
                 />
               </div>
               <div>
-                <Label htmlFor="plan-type" className="text-shodan-text">Plan Type</Label>
+                <Label htmlFor="plan-type" className="text-white">Plan Type</Label>
                 <Select value={newTeamData.planType} onValueChange={(value) => setNewTeamData({ ...newTeamData, planType: value })}>
-                  <SelectTrigger className="bg-shodan-surface border-shodan-accent/30 text-shodan-text">
+                  <SelectTrigger className="dark-input">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-shodan-surface border-shodan-accent/30">
+                  <SelectContent className="glassmorphism">
                     <SelectItem value="free">Free (5 members, 10 projects)</SelectItem>
                     <SelectItem value="pro">Pro (25 members, 50 projects)</SelectItem>
                     <SelectItem value="enterprise">Enterprise (Unlimited)</SelectItem>
@@ -283,7 +283,7 @@ export default function TeamsPage() {
               <Button 
                 onClick={() => createTeamMutation.mutate(newTeamData)}
                 disabled={createTeamMutation.isPending}
-                className="w-full bg-shodan-accent hover:bg-shodan-accent/90 text-shodan-bg"
+                className="w-full bg-[hsl(188,95%,43%)] hover:bg-[hsl(186,85%,57%)] text-[hsl(222,47%,11%)] font-medium"
               >
                 {createTeamMutation.isPending ? "Creating..." : "Create Team"}
               </Button>
@@ -293,53 +293,74 @@ export default function TeamsPage() {
       </div>
 
       {/* Teams Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {teams?.map((team: Team) => (
-          <Card 
-            key={team.id} 
-            className={`bg-shodan-surface/50 border-shodan-accent/30 cursor-pointer transition-all hover:border-shodan-accent/60 ${
-              selectedTeam?.id === team.id ? 'ring-2 ring-shodan-accent' : ''
-            }`}
-            onClick={() => setSelectedTeam(team)}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-shodan-text flex items-center gap-2">
-                  <Users className="h-5 w-5 text-shodan-accent" />
-                  {team.name}
-                </CardTitle>
-                <Badge variant="outline" className={getPlanColor(team.planType)}>
-                  {team.planType}
-                </Badge>
-              </div>
-              <p className="text-sm text-shodan-text/60 mt-2">{team.description}</p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+      {teams && teams.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {teams.map((team: Team) => (
+            <Card 
+              key={team.id} 
+              className={`glassmorphism cursor-pointer transition-all hover:border-[hsl(188,95%,43%)] ${
+                selectedTeam?.id === team.id ? 'ring-2 ring-[hsl(188,95%,43%)]' : ''
+              }`}
+              onClick={() => setSelectedTeam(team)}
+            >
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-shodan-text/60">Your Role</span>
-                  <Badge variant="outline" className={getRoleColor(team.role)}>
-                    {getRoleIcon(team.role)}
-                    <span className="ml-1 capitalize">{team.role}</span>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Users className="h-5 w-5 text-[hsl(188,95%,43%)]" />
+                    {team.name}
+                  </CardTitle>
+                  <Badge variant="outline" className={getPlanColor(team.planType)}>
+                    {team.planType}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-shodan-text/60">Members</span>
-                  <span className="text-sm text-shodan-text">{team.memberCount}/{team.maxMembers}</span>
+                <p className="text-sm text-[hsl(215,20%,65%)] mt-2">{team.description}</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[hsl(215,20%,65%)]">Your Role</span>
+                    <Badge variant="outline" className={getRoleColor(team.role)}>
+                      {getRoleIcon(team.role)}
+                      <span className="ml-1 capitalize">{team.role}</span>
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[hsl(215,20%,65%)]">Members</span>
+                    <span className="text-sm text-white">{team.memberCount}/{team.maxMembers}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[hsl(215,20%,65%)]">Projects</span>
+                    <span className="text-sm text-white">{team.projectCount}/{team.maxProjects}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[hsl(215,20%,65%)]">Owner</span>
+                    <span className="text-sm text-white">{team.owner?.username || 'Unknown'}</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-shodan-text/60">Projects</span>
-                  <span className="text-sm text-shodan-text">{team.projectCount}/{team.maxProjects}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-shodan-text/60">Owner</span>
-                  <span className="text-sm text-shodan-text">{team.owner.username}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card className="glassmorphism">
+          <CardContent className="p-12 text-center">
+            <div className="w-16 h-16 bg-[hsl(215,25%,27%)] rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-[hsl(215,20%,65%)]" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">No teams yet</h3>
+            <p className="text-[hsl(215,20%,65%)] mb-6">
+              Create your first team to start collaborating with others
+            </p>
+            <Button
+              onClick={() => setIsCreateTeamOpen(true)}
+              className="bg-[hsl(188,95%,43%)] hover:bg-[hsl(186,85%,57%)] text-[hsl(222,47%,11%)] font-medium"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Team
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Team Details */}
       {selectedTeam && (
