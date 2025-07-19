@@ -1,0 +1,1 @@
+{"id": "geojson-validator", "name": "GeoJSON Validator", "description": "Checks if input is valid GeoJSON object.", "entry": "script.ts"}

@@ -1,0 +1,1 @@
+{"id": "resume-parser", "name": "Resume Parser", "description": "Extracts name, email, skills from resume text.", "entry": "script.ts"}

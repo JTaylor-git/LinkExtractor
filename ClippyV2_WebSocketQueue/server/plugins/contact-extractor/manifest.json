@@ -1,0 +1,1 @@
+{"id": "contact-extractor", "name": "Contact Info Extractor", "description": "Extracts emails and phone numbers from any text.", "entry": "script.ts"}

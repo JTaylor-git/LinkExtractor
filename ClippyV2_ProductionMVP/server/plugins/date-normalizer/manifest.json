@@ -1,0 +1,1 @@
+{"id": "date-normalizer", "name": "Date Normalizer", "description": "Normalizes YYYY/MM/DD, MM-DD-YYYY etc to ISO.", "entry": "script.ts"}

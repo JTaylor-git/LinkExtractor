@@ -1,0 +1,1 @@
+{"id": "csv-cleaner", "name": "CSV Cleaner", "description": "Trims spaces, removes empty rows, normalizes header casing.", "entry": "script.ts"}

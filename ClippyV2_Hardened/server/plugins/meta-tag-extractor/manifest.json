@@ -1,0 +1,1 @@
+{"id": "meta-tag-extractor", "name": "Meta Tag Extractor", "description": "Extracts title, description, keywords from HTML head.", "entry": "script.ts"}

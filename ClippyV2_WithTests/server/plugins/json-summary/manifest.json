@@ -1,0 +1,1 @@
+{"id": "json-summary", "name": "JSON Summarizer", "description": "Gives a quick summary of JSON array: keys, types.", "entry": "script.ts"}

@@ -1,0 +1,6 @@
+{
+  "id": "example-plugin",
+  "name": "Example Scraper",
+  "description": "Scrapes simple table data from HTML pages.",
+  "entry": "script.ts"
+}

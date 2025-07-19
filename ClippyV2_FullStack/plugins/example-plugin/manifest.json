@@ -1,0 +1,6 @@
+{
+  "id": "example-plugin",
+  "name": "Example Plugin",
+  "description": "Extracts <td> values from HTML",
+  "entry": "script.ts"
+}

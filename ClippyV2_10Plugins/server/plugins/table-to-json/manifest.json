@@ -1,0 +1,1 @@
+{"id": "table-to-json", "name": "Table to JSON", "description": "Converts HTML table rows to array of objects.", "entry": "script.ts"}

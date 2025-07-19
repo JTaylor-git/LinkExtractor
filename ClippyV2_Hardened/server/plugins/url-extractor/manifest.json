@@ -1,0 +1,1 @@
+{"id": "url-extractor", "name": "URL Extractor", "description": "Finds and returns all URLs from text or HTML.", "entry": "script.ts"}

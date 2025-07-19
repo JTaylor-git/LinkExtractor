@@ -1,0 +1,1 @@
+{"id": "invoice-parser", "name": "Invoice Parser", "description": "Extracts total amount, date, vendor from invoice text.", "entry": "script.ts"}
