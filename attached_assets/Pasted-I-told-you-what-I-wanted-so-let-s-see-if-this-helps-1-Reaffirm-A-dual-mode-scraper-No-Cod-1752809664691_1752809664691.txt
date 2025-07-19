@@ -1,0 +1,91 @@
+I told you what I wanted so let's see if this helps...
+
+1. Reaffirm 
+    A dual‑mode scraper (No‑Code wizard + Pro‑Code snippets/CLI).
+    A dark‑mode, Shodan‑style UI with Clippy guiding the user.
+    A robust engine under the hood (HTTP workers + Puppeteer + proxy support).
+    API/CLI integrations and export to geo‑formats (GeoJSON/KML), tables, CSV, mirrors, etc.
+
+That full list is absolutely achievable—but it’s a lot to build all at once. So let’s break it down into two phases:
+2. Phase 1: MVP (4–6 weeks)
+
+Goal: Get a working, polished “Clippr” scraper into users’ hands, with the core experience and Clippy in place.
+Features
+
+    Clippy Assistant UI
+
+        ClippyAssistant.svelte in the bottom‑right corner.
+
+        4‑step wizard: URL → Depth & Filters → Run → Download ZIP.
+
+        stepTo(n) hints and basic animations.
+
+    No‑Code Wizard
+
+        Input Start URL, Depth slider, File‑type checkboxes (.geojson, .kml, .html, etc.).
+
+        Live preview of CSS/XPath selector extraction for a single page.
+
+        Run button that kicks off a backend job.
+
+    Backend Scraper
+
+        HTTP workers only (no headless Chrome yet).
+
+        Configurable depth & filters, single‑domain restriction.
+
+        Simple local‑filesystem export (project folder mirror + manifest.json).
+
+    Basic Project Management
+
+        Create & list “projects” in a small Postgres table (name, start URL, depth, filters, status).
+
+        View job status and click “Download ZIP.”
+
+    Clean Dark UI
+
+        SvelteKit + Tailwind, dark navy background + neon accents.
+
+        Left nav: Dashboard (job list), New Scrape, Settings.
+
+    CLI (optional stretch)
+
+        A one‑binary clippr command:
+
+        clippr scrape \
+          --url "https://..." \
+          --depth 2 \
+          --include geojson,kml \
+          --out ./output.zip
+
+Deliverables
+
+    Monorepo scaffold: /web, /api, /cli.
+
+    Full UI with Clippy integration.
+
+    Backend service (Express or NestJS minimal) and Postgres schema.
+
+    Dockerfiles and a GH Actions workflow for build & test.
+
+    End‑to‑end demo: user runs a scrape, sees Clippy guide them, and downloads their files.
+
+3. Phase 2: Full‑Feature Platform (3–4 months)
+
+Goal: Layer in all the advanced capabilities once the MVP is stable.
+
+    Hybrid Rendering: add Puppeteer‑core support for JS sites.
+
+    Distributed Proxies: integrate ScraperAPI/Crawlbase and rotation.
+
+    Scheduler & Watcher: recurring & webhook‑triggered jobs.
+
+    API & gRPC: full remote orchestration, scoped API keys.
+
+    Plugin Marketplace: auth modules, custom parser plugins.
+
+    3D Globe Dashboard: D3/Three.js Earth visualization with live QPS gauge.
+
+    Analytics Tab: charts for requests, latency, errors.
+
+    Team Management: roles, project sharing.

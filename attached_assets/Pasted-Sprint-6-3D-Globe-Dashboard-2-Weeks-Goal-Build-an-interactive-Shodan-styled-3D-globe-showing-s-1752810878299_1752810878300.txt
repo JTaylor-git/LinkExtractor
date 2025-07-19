@@ -1,0 +1,331 @@
+Sprint 6: 3D Globe Dashboard (2 Weeks)
+
+Goal: Build an interactive, Shodan‑styled 3D globe showing scrape origin pins and a live QPS gauge, driven by real‑time metrics from the backend.
+📝 User Stories
+
+    Globe Visualization
+
+        As a user, I want to see a rotatable, zoomable 3D globe with pin drops representing my scrape origins (latitude/longitude clusters).
+
+    Live QPS Gauge
+
+        As a user, I want to see a real‑time gauge of queries‑per‑second (QPS) across all active scrapes.
+
+    Metrics API
+
+        As a developer, I want a REST endpoint (GET /api/dashboard/metrics) that returns { qps, clusters }.
+
+    Frontend Component
+
+        As a dev, I need a GlobeDashboard.svelte component using Three.js and SvelteKit to fetch metrics and render the globe + gauge.
+
+    Backend Stub & Tests
+
+        As a dev, I need a simple MetricsService (stub for now) and tests verifying the metrics shape.
+
+✔ Acceptance Criteria
+
+    GET /api/dashboard/metrics returns JSON:
+
+    {
+      "qps": number,            // e.g. 12.3
+      "clusters": [
+        {"lat": number, "lon": number, "label": string, "count": number},
+        …
+      ]
+    }
+
+    GlobeDashboard.svelte:
+
+        Initializes Three.js scene with a dark‑mode Earth textured sphere.
+
+        Places pin geometries at each {lat, lon}.
+
+        Continuously rotates globe.
+
+        Fetches metrics every 5 seconds, updating pins and QPS gauge.
+
+    QPS Gauge:
+
+        Radial SVG gauge on right with neon accent.
+
+        Reflects qps relative to a configurable maxQPS.
+
+    Metrics endpoint and component operate without errors; basic unit tests included.
+
+📂 File Structure
+
+/api
+ └─ src
+    ├─ engine
+    │   └─ MetricsService.ts       # stubbed metrics collector
+    └─ server
+       └─ rest
+          ├─ dashboard.routes.ts   # new endpoint
+          └─ index.ts              # mount dashboard.routes
+
+/tests
+ └─ api
+    └─ rest
+       └─ dashboard.routes.test.ts
+
+/web
+ └─ src
+    ├─ lib
+    │   └─ components
+    │      └─ GlobeDashboard.svelte
+    └─ routes
+       └─ dashboard
+          └─ +page.svelte
+
+1) Backend: MetricsService & Route
+a) MetricsService.ts (stub)
+
+// api/src/engine/MetricsService.ts
+export interface ClusterPoint {
+  lat: number;
+  lon: number;
+  label: string;
+  count: number;
+}
+
+/**
+ * For Sprint 6, we return stubbed or random metrics.
+ * In Sprint 7+, we'll wire this into real tracking data.
+ */
+export class MetricsService {
+  static getMetrics(): { qps: number; clusters: ClusterPoint[] } {
+    // stub QPS between 0–50
+    const qps = parseFloat((Math.random() * 50).toFixed(1));
+    // stub clusters at three major cities
+    const clusters: ClusterPoint[] = [
+      { lat: 37.7749, lon: -122.4194, label: 'SF', count: 5 },
+      { lat: 51.5074, lon: -0.1278,   label: 'LDN', count: 3 },
+      { lat: 35.6895, lon: 139.6917,  label: 'TYO', count: 2 }
+    ];
+    return { qps, clusters };
+  }
+}
+
+b) dashboard.routes.ts
+
+// api/src/server/rest/dashboard.routes.ts
+import { Router } from 'express';
+import { MetricsService } from '../../engine/MetricsService.js';
+
+const router = Router();
+
+/**
+ * GET /api/dashboard/metrics
+ * Returns real‑time dashboard data.
+ */
+router.get('/dashboard/metrics', (_req, res) => {
+  const metrics = MetricsService.getMetrics();
+  res.json(metrics);
+});
+
+export default router;
+
+c) Mount in REST index
+
+// api/src/server/rest/index.ts
+import express from 'express';
+import projectRoutes from './project.routes.js';
+import taskRoutes from './task.routes.js';
+import pluginRoutes from './plugin.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
+
+export function createRestApp() {
+  const app = express();
+  app.use(express.json());
+  app.use('/api/projects', projectRoutes);
+  app.use('/api', taskRoutes);
+  app.use('/api/plugins', pluginRoutes);
+  app.use('/api', dashboardRoutes);  // <— add this
+  return app;
+}
+
+d) Unit Test: dashboard.routes.test.ts
+
+// tests/api/rest/dashboard.routes.test.ts
+import request from 'supertest';
+import { createRestApp } from '../../../api/src/server/rest/index.js';
+
+describe('GET /api/dashboard/metrics', () => {
+  const app = createRestApp();
+
+  it('returns qps and clusters array', async () => {
+    const res = await request(app).get('/api/dashboard/metrics');
+    expect(res.status).toBe(200);
+    expect(typeof res.body.qps).toBe('number');
+    expect(Array.isArray(res.body.clusters)).toBe(true);
+    res.body.clusters.forEach((pt: any) => {
+      expect(typeof pt.lat).toBe('number');
+      expect(typeof pt.lon).toBe('number');
+      expect(typeof pt.label).toBe('string');
+      expect(typeof pt.count).toBe('number');
+    });
+  });
+});
+
+2) Frontend: GlobeDashboard.svelte
+
+<!-- web/src/lib/components/GlobeDashboard.svelte -->
+<script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
+  import * as THREE from 'three';
+
+  interface ClusterPoint {
+    lat: number;
+    lon: number;
+    label: string;
+    count: number;
+  }
+
+  let container: HTMLDivElement;
+  let scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer, globe: THREE.Mesh;
+  let pins: THREE.Mesh[] = [];
+  let animationId: number;
+  let qps = 0;
+  let clusters: ClusterPoint[] = [];
+  const maxQPS = 50; // for gauge scaling
+
+  // Convert lat/lon → 3D position on radius=5 sphere
+  function latLonToVector(lat: number, lon: number) {
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lon + 180) * (Math.PI / 180);
+    const r = 5;
+    return new THREE.Vector3(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.cos(phi),
+      r * Math.sin(phi) * Math.sin(theta)
+    );
+  }
+
+  function addPins() {
+    // remove old
+    pins.forEach(p => scene.remove(p));
+    pins = [];
+
+    clusters.forEach(pt => {
+      const geom = new THREE.SphereGeometry(0.1 + 0.05 * Math.log1p(pt.count), 8, 8);
+      const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0,1,0) });
+      const mesh = new THREE.Mesh(geom, mat);
+      const pos = latLonToVector(pt.lat, pt.lon);
+      mesh.position.copy(pos);
+      scene.add(mesh);
+      pins.push(mesh);
+    });
+  }
+
+  async function fetchMetrics() {
+    try {
+      const res = await fetch('/api/dashboard/metrics');
+      const data = await res.json();
+      qps = data.qps;
+      clusters = data.clusters as ClusterPoint[];
+      addPins();
+    } catch (e) {
+      console.error('Failed to load metrics', e);
+    }
+  }
+
+  function initScene() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    // Earth sphere
+    const geom = new THREE.SphereGeometry(5, 64, 64);
+    const texLoader = new THREE.TextureLoader();
+    const mat = new THREE.MeshBasicMaterial({
+      map: texLoader.load('/assets/earth-dark.jpg')
+    });
+    globe = new THREE.Mesh(geom, mat);
+    scene.add(globe);
+
+    camera.position.z = 10;
+  }
+
+  function animate() {
+    animationId = requestAnimationFrame(animate);
+    globe.rotation.y += 0.0005;
+    renderer.render(scene, camera);
+  }
+
+  onMount(() => {
+    initScene();
+    animate();
+    fetchMetrics();
+    const interval = setInterval(fetchMetrics, 5000);
+    return () => {
+      clearInterval(interval);
+      cancelAnimationFrame(animationId);
+      renderer.dispose();
+    };
+  });
+</script>
+
+<style>
+  .dashboard { display: grid; grid-template-columns: 1fr 220px; gap: 1rem; }
+  .globe-container { width: 100%; height: 500px; background: var(--bg); }
+  .gauge { position: relative; width: 200px; height: 200px; }
+  .gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .gauge .label {
+    position: absolute; top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    color: var(--text); font-size: 1.2rem;
+  }
+</style>
+
+<div class="dashboard">
+  <div bind:this={container} class="globe-container"></div>
+  <div class="gauge">
+    <svg viewBox="0 0 36 36">
+      <path
+        d="M18 2.0845
+           a 15.9155 15.9155 0 0 1 0 31.831
+           a 15.9155 15.9155 0 0 1 0 -31.831"
+        fill="none"
+        stroke="var(--accent)"
+        stroke-width="2"
+        stroke-dasharray="{(qps / maxQPS) * 100} 100"
+      />
+    </svg>
+    <div class="label">{qps.toFixed(1)} QPS</div>
+  </div>
+</div>
+
+3) Route & Page Integration
+a) +page.svelte
+
+<!-- web/src/routes/dashboard/+page.svelte -->
+<script>
+  import GlobeDashboard from '$lib/components/GlobeDashboard.svelte';
+</script>
+
+<GlobeDashboard />
+
+b) Ensure Earth Texture
+
+    Place a dark‑mode earth texture at web/static/assets/earth-dark.jpg. Use any high‑contrast map.
+
+✅ Next Steps
+
+    Merge backend stubs and REST route; run npm test for dashboard.routes.
+
+    Deploy api and verify GET /api/dashboard/metrics.
+
+    Merge GlobeDashboard.svelte and route; run npm run dev for the frontend.
+
+    Visit http://localhost:3000/dashboard; confirm:
+
+        Interactive globe rendering.
+
+        Neon pins appear.
+
+        QPS gauge updates every 5 s.
+
+    Tweak maxQPS or styling as needed.

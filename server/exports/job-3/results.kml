@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Scrape Results</name>
+    
+    <Placemark>
+      <name>ProVisualizer.com - Planning and Visualization Tools for Competitive Golfers</name>
+      <description><![CDATA[ProVisualizer.com - Planning and Visualization Tools for Competitive Golfers Home 2D Planner 3D Planner My Profile My Courses Pro Calendar News Features Support Welcome to ProVisualizer.com! state-of-]]></description>
+      <Point>
+        <coordinates>0,0,0</coordinates>
+      </Point>
+    </Placemark>
+  
+  </Document>
+</kml>
