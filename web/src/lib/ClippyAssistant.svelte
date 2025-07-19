@@ -32,6 +32,7 @@
       agent.speak('🔍 Hi! I’m Clippr, your scraping assistant.');
       dispatch('ready');
     });
+
     return () => agent && agent.hide();
   });
 </script>

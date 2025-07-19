@@ -13,9 +13,25 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 10
-      - name: Install
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm -r run build
-      - name: Test
+      - name: Debug build context
+        run: |
+          echo "Current directory: $PWD"
+          echo "PATH: $PATH"
+          pnpm -v
+          node -v
+          which svelte-kit || true
+          npx svelte-kit --version || true
+          cd web && which svelte-kit || true
+          cd web && npx svelte-kit --version || true
+      - name: Clean install all dependencies
+        run: |
+          rm -rf node_modules pnpm-lock.yaml web/node_modules web/pnpm-lock.yaml web/node_modules/.bin
+          pnpm install --no-frozen-lockfile
+      - name: Verify SvelteKit CLI availability
+        run: |
+          ls -l web/node_modules/.bin
+          web/node_modules/.bin/svelte-kit --version
+      - name: Build all packages
+        run: pnpm -r run npx build
+      - name: Test all packages
         run: pnpm -r run test

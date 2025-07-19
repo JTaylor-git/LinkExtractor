@@ -1,0 +1,38 @@
+[
+  {
+    "url": "http://www.provisualizer.com",
+    "title": "ProVisualizer.com - Planning and Visualization Tools for Competitive Golfers",
+    "content": "ProVisualizer.com - Planning and Visualization Tools for Competitive Golfers Home 2D Planner 3D Planner My Profile My Courses Pro Calendar News Features Support Welcome to ProVisualizer.com! state-of-the-art planning and visualization tools for competitive golfers 2D/3D Planner for Desktop/Laptop/Tablet Mobile Planner Yardage Charts Google Earth Integration Develop a Precision Game Plan create your own Custom Yardage Charts and Visualize your round in Google Earth. Or follow the pros on the PGA and European Tours using the pre-mapped courses on our Pro Calendar . Or explore some of the greatest courses in the world on our Global Map and Features pages. Everything you need to take your game to the next level. We hope you enjoy the site! The ProVisualizer Team Learn How it Works or take a quick tour of Pebble Beach and Bandon Dunes .",
+    "extractedData": {
+      "meta": {
+        "viewport": "initial-scale=1, maximum-scale=1"
+      },
+      "images": [
+        "images/AugustaNational2D.JPG",
+        "images/AugustaNationalMobile.JPG",
+        "images/AugustaNationalYardage.JPG",
+        "images/AugustaNationalGE.JPG"
+      ],
+      "links": [
+        "2dplanner.php",
+        "3dplanner.php",
+        "myprofile.php",
+        "mycourses.php",
+        "procalendar.php",
+        "news.php",
+        "features.php",
+        "support.php",
+        "3dlink.php?id=1",
+        "mobilelink.php?id=1",
+        "yardagelink.php?id=1",
+        "courses/augustanational.php",
+        "procalendar.php",
+        "globalmap.php",
+        "features.php",
+        "support/faq.php",
+        "courses/pebblebeach.php",
+        "courses/bandondunes.php"
+      ]
+    }
+  }
+]

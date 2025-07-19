@@ -1,0 +1,12 @@
+{
+  "project": "Pro",
+  "jobId": 3,
+  "totalResults": 1,
+  "exportFormats": [
+    "json",
+    "kml",
+    "html",
+    "geojson"
+  ],
+  "createdAt": "2025-07-18T05:02:09.508Z"
+}

@@ -1,3 +1,6 @@
-node_modules/
-dist/
-.svelte-kit/
+ode_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz

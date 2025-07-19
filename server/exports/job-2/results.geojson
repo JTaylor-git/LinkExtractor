@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "url": "https://www.provisualizer.com",
+        "title": "ProVisualizer.com - Planning and Visualization Tools for Competitive Golfers",
+        "content": "ProVisualizer.com - Planning and Visualization Tools for Competitive Golfers Home 2D Planner 3D Planner My Profile My Courses Pro Calendar News Features Support Welcome to ProVisualizer.com! state-of-"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      }
+    }
+  ]
+}

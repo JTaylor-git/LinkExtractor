@@ -22,18 +22,3 @@ Clippr is a web scraping platform combining no-code wizards and pro-code tools. 
 
 Each phase expands both no-code and pro-code capabilities while maintaining full test coverage and CI/CD pipelines.
 
-
-## Development
-
-1. Install dependencies using pnpm:
-   ```bash
-   pnpm install
-   ```
-2. Run the dev servers for all packages:
-   ```bash
-   pnpm dev
-   ```
-3. Build production assets:
-   ```bash
-   pnpm build
-   ```
