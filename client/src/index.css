@@ -104,3 +104,38 @@
     animation: float 3s infinite ease-in-out;
   }
 }
+
+/* Mosaic component styles */
+.mosaic {
+  height: 100% !important;
+  background: rgb(24 24 27) !important;
+}
+
+.mosaic-window {
+  background: rgb(24 24 27) !important;
+  border: 1px solid rgb(63 63 70) !important;
+}
+
+.mosaic-window-toolbar {
+  background: rgb(39 39 42) !important;
+  border-bottom: 1px solid rgb(63 63 70) !important;
+  color: rgb(244 244 245) !important;
+}
+
+.mosaic-window-title {
+  color: rgb(244 244 245) !important;
+  font-weight: 600 !important;
+}
+
+.mosaic-window-controls {
+  color: rgb(244 244 245) !important;
+}
+
+.mosaic-drop-target {
+  background: rgba(16 185 129 / 0.1) !important;
+  border: 2px dashed rgb(16 185 129) !important;
+}
+
+.mosaic-split {
+  background: rgb(63 63 70) !important;
+}

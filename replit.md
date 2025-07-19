@@ -13,11 +13,12 @@ Preferred communication style: Simple, everyday language.
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite for development and production builds
-- **Routing**: Wouter for client-side routing
+- **Routing**: React Router DOM for enhanced client-side routing with nested routes
 - **State Management**: TanStack Query (React Query) for server state management
 - **UI Framework**: Radix UI components with custom styling
 - **Styling**: Tailwind CSS with custom dark theme and glassmorphism effects
 - **Component Library**: Shadcn/ui components for consistent design system
+- **IDE Components**: Monaco Editor integration, React Mosaic for draggable panes
 
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript
@@ -26,6 +27,7 @@ Preferred communication style: Simple, everyday language.
 - **Session Management**: PostgreSQL-backed sessions with connect-pg-simple
 - **File Operations**: Archiver for creating downloadable ZIP files
 - **API Design**: RESTful API with structured error handling and logging
+- **Real-time Features**: WebSocket support for live log streaming and development features
 
 ### Development Setup
 - **Monorepo Structure**: Shared schemas and types between frontend and backend
@@ -71,6 +73,13 @@ Preferred communication style: Simple, everyday language.
 - **Team Collaboration**: Invite system, member management, project sharing
 - **Activity Auditing**: Comprehensive logging of all team and project activities
 - **Project Visibility**: Private, team-only, or public project access controls
+
+### 7. Workspace IDE
+- **Multi-pane Layout**: Draggable and resizable panes using React Mosaic
+- **Browser Pane**: Embedded iframe for live website testing and preview
+- **Code Editor**: Monaco Editor integration with syntax highlighting and IntelliSense
+- **Logs Pane**: Real-time log streaming via WebSocket connections
+- **Development Environment**: Full IDE experience for advanced scraping development
 
 ## Data Flow
 
