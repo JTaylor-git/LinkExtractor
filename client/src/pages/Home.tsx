@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, LayoutTemplate, BookOpen } from "lucide-react";
-import Layout from "@/components/Layout";
 import Dashboard from "@/components/Dashboard";
 import ProjectsList from "@/components/ProjectsList";
 import ClippyAssistant from "@/components/ClippyAssistant";
@@ -19,7 +18,7 @@ export default function Home() {
   ];
 
   return (
-    <Layout>
+    <>
       <header className="mb-8">
         <div className="flex items-center justify-between">
           <div>
@@ -112,6 +111,6 @@ export default function Home() {
 
       <ClippyAssistant onStartWizard={() => setIsWizardOpen(true)} />
       <ScrapeWizard open={isWizardOpen} onOpenChange={setIsWizardOpen} />
-    </Layout>
+    </>
   );
 }
